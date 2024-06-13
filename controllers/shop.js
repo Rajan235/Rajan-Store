@@ -1,11 +1,9 @@
 const Product = require("../models/product");
 const Order = require("../models/order");
-const User = require("../models/user");
 
 exports.getProducts = (req, res, next) => {
   Product.findAll()
     .then((products) => {
-      console.log(products);
       res.render("shop/product-list", {
         prods: products,
         pageTitle: "All Products",
@@ -13,7 +11,12 @@ exports.getProducts = (req, res, next) => {
       });
     })
     .catch((err) => {
-      console.log(err);
+      console.error("Error fetching products:", err);
+      res.status(500).render("error/500", {
+        pageTitle: "Error",
+        path: "/500",
+        errorMessage: "Error fetching products.",
+      });
     });
 };
 
@@ -21,13 +24,27 @@ exports.getProduct = (req, res, next) => {
   const prodId = req.params.productId;
   Product.findByPk(prodId)
     .then((product) => {
+      if (!product) {
+        return res.status(404).render("error/404", {
+          pageTitle: "Product Not Found",
+          path: "/404",
+          errorMessage: "Product not found.",
+        });
+      }
       res.render("shop/product-detail", {
         product: product,
         pageTitle: product.title,
         path: "/products",
       });
     })
-    .catch((err) => console.log(err));
+    .catch((err) => {
+      console.error("Error fetching product details:", err);
+      res.status(500).render("error/500", {
+        pageTitle: "Error",
+        path: "/500",
+        errorMessage: "Error fetching product details.",
+      });
+    });
 };
 
 exports.getIndex = (req, res, next) => {
@@ -40,7 +57,12 @@ exports.getIndex = (req, res, next) => {
       });
     })
     .catch((err) => {
-      console.log(err);
+      console.error("Error fetching products for index:", err);
+      res.status(500).render("error/500", {
+        pageTitle: "Error",
+        path: "/500",
+        errorMessage: "Error fetching products.",
+      });
     });
 };
 
@@ -69,36 +91,62 @@ exports.getCart = (req, res, next) => {
         products: products,
       });
     })
-    .catch((err) => console.log(err));
+    .catch((err) => {
+      console.error("Error fetching cart:", err);
+      res.status(500).render("error/500", {
+        pageTitle: "Error",
+        path: "/500",
+        errorMessage: "Error fetching cart.",
+      });
+    });
 };
 
 exports.postCart = (req, res, next) => {
   const prodId = req.body.productId;
   Product.findByPk(prodId)
     .then((product) => {
+      if (!product) {
+        req.flash("error", "Product not found.");
+        return res.redirect("/products");
+      }
       return req.user.addToCart(product);
     })
-    .then((result) => {
-      console.log(result);
+    .then(() => {
       res.redirect("/cart");
     })
-    .catch((err) => console.log(err));
+    .catch((err) => {
+      console.error("Error adding product to cart:", err);
+      res.status(500).render("error/500", {
+        pageTitle: "Error",
+        path: "/500",
+        errorMessage: "Error adding product to cart.",
+      });
+    });
 };
 
 exports.postCartDeleteProduct = (req, res, next) => {
   const prodId = req.body.productId;
   req.user
     .removeFromCart(prodId)
-    .then((result) => {
+    .then(() => {
       res.redirect("/cart");
     })
-    .catch((err) => console.log(err));
+    .catch((err) => {
+      console.error("Error removing product from cart:", err);
+      res.status(500).render("error/500", {
+        pageTitle: "Error",
+        path: "/500",
+        errorMessage: "Error removing product from cart.",
+      });
+    });
 };
 
 exports.postOrder = (req, res, next) => {
+  let fetchedCartProducts;
   req.user
     .getCart()
     .then((products) => {
+      fetchedCartProducts = products;
       return Order.create({
         userId: req.user.id,
         userEmail: req.user.email,
@@ -114,7 +162,14 @@ exports.postOrder = (req, res, next) => {
     .then(() => {
       res.redirect("/orders");
     })
-    .catch((err) => console.log(err));
+    .catch((err) => {
+      console.error("Error creating order:", err);
+      res.status(500).render("error/500", {
+        pageTitle: "Error",
+        path: "/500",
+        errorMessage: "Error creating order.",
+      });
+    });
 };
 
 // exports.postOrder = (req, res, next) => {
@@ -152,5 +207,12 @@ exports.getOrders = (req, res, next) => {
         orders: orders,
       });
     })
-    .catch((err) => console.log(err));
+    .catch((err) => {
+      console.error("Error fetching orders:", err);
+      res.status(500).render("error/500", {
+        pageTitle: "Error",
+        path: "/500",
+        errorMessage: "Error fetching orders.",
+      });
+    });
 };
