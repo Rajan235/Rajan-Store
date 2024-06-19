@@ -63,7 +63,6 @@ exports.postAddProduct = (req, res, next) => {
     imageUrl: imageUrl,
     userId: userId,
   })
-    .save()
     .then((result) => {
       console.log("Created Product");
       res.redirect("/admin/products");
@@ -223,7 +222,7 @@ exports.deleteProduct = (req, res, next) => {
         return next(new Error("Product not found."));
       }
       fileHelper.deleteFile(product.imageUrl);
-      return Product.deleteOne({ _id: prodId, userId: req.user._id });
+      return Product.destroy({ where: { id: prodId, userId: req.user.id } }); // Updated delete logic for Sequelize
     })
     .then(() => {
       console.log("DESTROYED PRODUCT");
