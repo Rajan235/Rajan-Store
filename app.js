@@ -35,15 +35,17 @@ const fileStorage = multer.diskStorage({
     cb(null, "images");
   },
   filename: (req, file, cb) => {
-    cb(null, new Date().toISOString() + "-" + file.orignalname);
+    cb(
+      null,
+      new Date().toISOString().replace(/:/g, "-") + "-" + file.originalname
+    );
   },
 });
-
 const fileFilter = (req, file, cb) => {
   if (
-    file.mimetype() == "image/png" ||
-    file.mimetype() == "image/jpg" ||
-    file.mimetype() == "image/jpeg"
+    file.mimetype == "image/png" ||
+    file.mimetype == "image/jpg" ||
+    file.mimetype == "image/jpeg"
   ) {
     cb(null, true);
   } else {
@@ -63,6 +65,8 @@ app.use(
   multer({ storage: fileStorage, fileFilter: fileFilter }).single("image")
 );
 app.use(express.static(path.join(__dirname, "public")));
+app.use("/images", express.static(path.join(__dirname, "images")));
+
 app.use(
   session({
     secret: "my secret",
@@ -195,7 +199,8 @@ Product.belongsToMany(Order, { through: OrderItem });
 //   });
 
 sequelize
-  .sync({ force: true }) // Use force:true only during development to reset tables
+  //.sync({ force: true }) // Use force:true only during development to reset tables
+  .sync()
   .then(() => {
     // Optionally create a default user if necessary
     return User.findByPk(1);

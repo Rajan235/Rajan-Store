@@ -37,7 +37,6 @@ exports.postAddProduct = (req, res, next) => {
       validationErrors: [],
     });
   }
-  const imageUrl = image.path();
 
   if (!errors.isEmpty()) {
     console.log(errors.array());
@@ -55,6 +54,7 @@ exports.postAddProduct = (req, res, next) => {
       validationErrors: errors.array(),
     });
   }
+  const imageUrl = image.path;
 
   Product.create({
     title: title,
