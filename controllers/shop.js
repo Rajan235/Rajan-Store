@@ -11,12 +11,9 @@ exports.getProducts = (req, res, next) => {
       });
     })
     .catch((err) => {
-      console.error("Error fetching products:", err);
-      res.status(500).render("error/500", {
-        pageTitle: "Error",
-        path: "/500",
-        errorMessage: "Error fetching products.",
-      });
+      const error = new Error(err);
+      error.httpStatusCode = 500;
+      return next(error);
     });
 };
 
@@ -38,12 +35,9 @@ exports.getProduct = (req, res, next) => {
       });
     })
     .catch((err) => {
-      console.error("Error fetching product details:", err);
-      res.status(500).render("error/500", {
-        pageTitle: "Error",
-        path: "/500",
-        errorMessage: "Error fetching product details.",
-      });
+      const error = new Error(err);
+      error.httpStatusCode = 500;
+      return next(error);
     });
 };
 
@@ -57,15 +51,11 @@ exports.getIndex = (req, res, next) => {
       });
     })
     .catch((err) => {
-      console.error("Error fetching products for index:", err);
-      res.status(500).render("error/500", {
-        pageTitle: "Error",
-        path: "/500",
-        errorMessage: "Error fetching products.",
-      });
+      const error = new Error(err);
+      error.httpStatusCode = 500;
+      return next(error);
     });
 };
-
 // exports.getCart = (req, res, next) => {
 //   req.user
 //     .populate("cart.items.productId")
@@ -92,12 +82,9 @@ exports.getCart = (req, res, next) => {
       });
     })
     .catch((err) => {
-      console.error("Error fetching cart:", err);
-      res.status(500).render("error/500", {
-        pageTitle: "Error",
-        path: "/500",
-        errorMessage: "Error fetching cart.",
-      });
+      const error = new Error(err);
+      error.httpStatusCode = 500;
+      return next(error);
     });
 };
 
@@ -115,12 +102,9 @@ exports.postCart = (req, res, next) => {
       res.redirect("/cart");
     })
     .catch((err) => {
-      console.error("Error adding product to cart:", err);
-      res.status(500).render("error/500", {
-        pageTitle: "Error",
-        path: "/500",
-        errorMessage: "Error adding product to cart.",
-      });
+      const error = new Error(err);
+      error.httpStatusCode = 500;
+      return next(error);
     });
 };
 
@@ -132,12 +116,9 @@ exports.postCartDeleteProduct = (req, res, next) => {
       res.redirect("/cart");
     })
     .catch((err) => {
-      console.error("Error removing product from cart:", err);
-      res.status(500).render("error/500", {
-        pageTitle: "Error",
-        path: "/500",
-        errorMessage: "Error removing product from cart.",
-      });
+      const error = new Error(err);
+      error.httpStatusCode = 500;
+      return next(error);
     });
 };
 
@@ -163,12 +144,9 @@ exports.postOrder = (req, res, next) => {
       res.redirect("/orders");
     })
     .catch((err) => {
-      console.error("Error creating order:", err);
-      res.status(500).render("error/500", {
-        pageTitle: "Error",
-        path: "/500",
-        errorMessage: "Error creating order.",
-      });
+      const error = new Error(err);
+      error.httpStatusCode = 500;
+      return next(error);
     });
 };
 
@@ -208,11 +186,8 @@ exports.getOrders = (req, res, next) => {
       });
     })
     .catch((err) => {
-      console.error("Error fetching orders:", err);
-      res.status(500).render("error/500", {
-        pageTitle: "Error",
-        path: "/500",
-        errorMessage: "Error fetching orders.",
-      });
+      const error = new Error(err);
+      error.httpStatusCode = 500;
+      return next(error);
     });
 };
