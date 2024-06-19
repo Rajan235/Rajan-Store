@@ -5,7 +5,7 @@ const crypto = require("crypto");
 const nodemailer = require("nodemailer");
 const nodemailMailgun = require("nodemailer-mailgun-transport");
 // const sendgridTransport = require("nodemailer-sendgrid-transport");
-const { validationResult } = require("express-validator/check");
+const { validationResult } = require("express-validator");
 
 const { Op } = require("sequelize"); // Import Op for operators
 
