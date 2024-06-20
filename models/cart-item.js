@@ -1,31 +1,32 @@
 const { DataTypes, Model } = require("sequelize");
 const sequelize = require("../util/database");
-const Cart = require("./cart");
-const Product = require("./product");
 
-class CartItem extends Model {}
+class CartItem extends Model {
+  // static associate(models) {
+  //   this.belongsTo(models.Cart, { foreignKey: "cartId", onDelete: "CASCADE" });
+  //   this.belongsTo(models.Product, {
+  //     foreignKey: "productId",
+  //     onDelete: "CASCADE",
+  //   });
+  // }
+}
 
 CartItem.init(
   {
+    id: {
+      // type: DataTypes.UUID,
+      // primaryKey: true,
+      // defaultValue: DataTypes.UUIDV4,
+      type: DataTypes.INTEGER,
+      autoIncrement: true,
+      primaryKey: true,
+    },
     quantity: {
       type: DataTypes.INTEGER,
       allowNull: false,
       defaultValue: 1,
-    },
-    cartId: {
-      type: DataTypes.INTEGER,
-      allowNull: false,
-      references: {
-        model: Cart,
-        key: "id",
-      },
-    },
-    productId: {
-      type: DataTypes.INTEGER,
-      allowNull: false,
-      references: {
-        model: Product,
-        key: "id",
+      validate: {
+        min: 1,
       },
     },
   },
@@ -35,10 +36,5 @@ CartItem.init(
     tableName: "CartItems",
   }
 );
-
-CartItem.belongsTo(Cart, { foreignKey: "cartId" });
-CartItem.belongsTo(Product, { foreignKey: "productId" });
-Cart.hasMany(CartItem, { foreignKey: "cartId" });
-Product.hasMany(CartItem, { foreignKey: "productId" });
 
 module.exports = CartItem;

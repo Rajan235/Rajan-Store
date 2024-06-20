@@ -1,18 +1,24 @@
 const { DataTypes, Model } = require("sequelize");
 const sequelize = require("../util/database");
-const User = require("./user");
-
-class Cart extends Model {}
+class Cart extends Model {
+  // static associate(models) {
+  //   this.belongsTo(models.User, { foreignKey: "userId", onDelete: "CASCADE" });
+  //   this.hasMany(models.CartItem, {
+  //     foreignKey: "cartId",
+  //     onDelete: "CASCADE",
+  //   });
+  // }
+}
 
 Cart.init(
   {
-    userId: {
+    id: {
+      // type: DataTypes.UUID,
+      // primaryKey: true,
+      // defaultValue: DataTypes.UUIDV4,
       type: DataTypes.INTEGER,
-      allowNull: false,
-      references: {
-        model: User,
-        key: "id",
-      },
+      autoIncrement: true,
+      primaryKey: true,
     },
   },
   {
@@ -21,8 +27,5 @@ Cart.init(
     tableName: "Carts",
   }
 );
-
-Cart.belongsTo(User, { foreignKey: "userId" });
-User.hasOne(Cart, { foreignKey: "userId" });
 
 module.exports = Cart;
