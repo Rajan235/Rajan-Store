@@ -45,6 +45,7 @@ exports.getProduct = (req, res, next) => {
   const prodId = req.params.productId;
   Product.findByPk(prodId) // Changed findById() to findByPk()
     .then((product) => {
+      //console.log(product);
       res.render("shop/product-detail", {
         product: product,
         pageTitle: product.title,
@@ -94,6 +95,7 @@ exports.getCart = (req, res, next) => {
   req.user
     .getCart() // Using custom getCart method from User model
     .then((products) => {
+      console.log("Cart products after getting cart method:", products);
       res.render("shop/cart", {
         path: "/cart",
         pageTitle: "Your Cart",
@@ -109,17 +111,17 @@ exports.getCart = (req, res, next) => {
 
 exports.postCart = (req, res, next) => {
   const prodId = req.body.productId;
-  let fetchedCart;
-  req.user
-    .getCart() // Using custom getCart method from User model
-    .then((cart) => {
-      fetchedCart = cart;
-      return Product.findByPk(prodId); // Changed findById() to findByPk()
-    })
+  console.log("Product ID in add to cart post method:", prodId);
+
+  Product.findByPk(prodId)
     .then((product) => {
-      return req.user.addToCart(product); // Using custom addToCart method from User model
+      if (!product) {
+        return res.redirect("/cart");
+      }
+      return req.user.addToCart(product);
     })
-    .then(() => {
+    .then((updatedCart) => {
+      console.log("Updated cart before redirecting to cart:", updatedCart);
       res.redirect("/cart");
     })
     .catch((err) => {
