@@ -1,5 +1,6 @@
 const { DataTypes, Model } = require("sequelize");
 const sequelize = require("../util/database");
+
 class Cart extends Model {
   // static associate(models) {
   //   this.belongsTo(models.User, { foreignKey: "userId", onDelete: "CASCADE" });

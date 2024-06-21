@@ -1,5 +1,6 @@
 const { DataTypes, Model } = require("sequelize");
 const sequelize = require("../util/database");
+
 class Product extends Model {
   // static associate(models) {
   //   this.belongsTo(models.User, { foreignKey: "userId", onDelete: "CASCADE" });
@@ -25,7 +26,7 @@ Product.init(
       autoIncrement: true,
       primaryKey: true,
     },
-    name: {
+    title: {
       type: DataTypes.STRING,
       allowNull: false,
     },

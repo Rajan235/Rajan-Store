@@ -159,7 +159,6 @@ exports.postEditProduct = (req, res, next) => {
       hasError: true,
       product: {
         title: updatedTitle,
-
         price: updatedPrice,
         description: updatedDesc,
         id: prodId,

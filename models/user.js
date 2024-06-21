@@ -1,6 +1,12 @@
 const { DataTypes, Model } = require("sequelize");
 const sequelize = require("../util/database");
 
+const Product = require("./product");
+const Order = require("./order");
+const OrderItem = require("./order-item");
+const Cart = require("./cart");
+const CartItem = require("./cart-item");
+
 class User extends Model {
   // static associate(models) {
   //   this.hasMany(models.Product, { foreignKey: "userId", onDelete: "CASCADE" });
@@ -10,6 +16,43 @@ class User extends Model {
   // async validatePassword(password) {
   //   return bcrypt.compare(password, this.password);
   // }
+  async getCart() {
+    const user = await User.findByPk(this.id, {
+      include: [
+        {
+          model: Cart,
+          include: [
+            {
+              model: CartItem,
+              include: [Product],
+            },
+          ],
+        },
+      ],
+    });
+
+    return user.Cart || null; // Return the user's cart or null if not found
+  }
+  async removeFromCart(productId) {
+    const cart = await this.getCart();
+    if (!cart) {
+      const error = new Error("Cart not found");
+      error.statusCode = 404;
+      throw error;
+    }
+
+    const cartItem = await CartItem.findOne({
+      where: { cartId: cart.id, productId: productId },
+    });
+
+    if (!cartItem) {
+      const error = new Error("Cart item not found");
+      error.statusCode = 404;
+      throw error;
+    }
+
+    await cartItem.destroy();
+  }
 }
 
 User.init(

@@ -3,10 +3,9 @@ const crypto = require("crypto");
 const bcrypt = require("bcryptjs");
 const nodemailer = require("nodemailer");
 const nodemailMailgun = require("nodemailer-mailgun-transport");
-// const sendgridTransport = require("nodemailer-sendgrid-transport");
 const { validationResult } = require("express-validator");
 
-const { Op } = require("sequelize"); // Import Op for operators
+const { Op } = require("sequelize");
 
 const User = require("../models/user");
 
@@ -126,6 +125,7 @@ exports.postLogin = (req, res, next) => {
 exports.postSignup = (req, res, next) => {
   const email = req.body.email;
   const password = req.body.password;
+  const confirmPassword = req.body.confirmPassword;
 
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
@@ -136,7 +136,7 @@ exports.postSignup = (req, res, next) => {
       oldInput: {
         email: email,
         password: password,
-        confirmPassword: req.body.confirmPassword,
+        confirmPassword: confirmPassword,
       },
       validationErrors: errors.array(),
     });
@@ -148,7 +148,6 @@ exports.postSignup = (req, res, next) => {
       return User.create({
         email: email,
         password: hashedPassword,
-        cart: { items: [] },
       });
     })
     .then((result) => {
