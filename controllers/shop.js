@@ -385,8 +385,16 @@ exports.getOrders = (req, res, next) => {
 
 exports.getInvoice = (req, res, next) => {
   const orderId = req.params.orderId;
-  Order.findByPk(orderId, { include: ["products"] })
+  Order.findByPk(orderId, {
+    include: [
+      {
+        model: Product,
+        through: OrderItem,
+      },
+    ],
+  })
     .then((order) => {
+      //console.log("yeh mera order hai::::::", order);
       if (!order) {
         return next(new Error("No order found."));
       }
@@ -415,14 +423,15 @@ exports.getInvoice = (req, res, next) => {
       pdfDoc.text(`Customer: ${req.user.email}`);
       pdfDoc.text("----------------------------------------------------");
       let totalPrice = 0;
-      order.products.forEach((prod) => {
-        totalPrice += prod.orderItem.quantity * prod.price;
+
+      order.Products.forEach((prod) => {
+        totalPrice += prod.OrderItem.quantity * prod.price;
         pdfDoc
           .fontSize(14)
-          .text(`${prod.title} - ${prod.orderItem.quantity} x $${prod.price}`);
+          .text(`${prod.title} - ${prod.OrderItem.quantity} x $${prod.price}`);
       });
       pdfDoc.text("----------------------------------------------------");
-      pdfDoc.fontSize(20).text(`Total Price: $${totalPrice.toFixed(2)}`);
+      pdfDoc.fontSize(20).text(`Total Price: $${totalPrice}`);
       pdfDoc.text("----------------------------------------------------");
       pdfDoc.fontSize(14).text("Thank you for your purchase!");
 
