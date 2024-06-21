@@ -1,6 +1,7 @@
 const initializeAssociations = (sequelize) => {
   const { User, Product, Order, OrderItem, Cart, CartItem } = sequelize.models;
-  //it is for admin to create products
+
+  // User and Product (admin creating products)
   User.hasMany(Product, {
     foreignKey: { name: "userId", allowNull: false },
     onDelete: "CASCADE",
@@ -9,6 +10,7 @@ const initializeAssociations = (sequelize) => {
     foreignKey: { name: "userId", allowNull: false },
   });
 
+  // User and Order
   User.hasMany(Order, {
     foreignKey: { name: "userId", allowNull: false },
     onDelete: "CASCADE",
@@ -17,6 +19,7 @@ const initializeAssociations = (sequelize) => {
     foreignKey: { name: "userId", allowNull: false },
   });
 
+  // Order and Product through OrderItem
   Order.belongsToMany(Product, {
     through: OrderItem, // Added the `through` option
     foreignKey: { name: "orderId", allowNull: false },
@@ -28,6 +31,7 @@ const initializeAssociations = (sequelize) => {
     onDelete: "CASCADE",
   });
 
+  // CartItem and its associations
   CartItem.belongsTo(Cart, {
     foreignKey: { name: "cartId", allowNull: false },
     onDelete: "CASCADE",
@@ -45,6 +49,7 @@ const initializeAssociations = (sequelize) => {
     onDelete: "CASCADE",
   });
 
+  // Cart and User
   Cart.belongsTo(User, {
     foreignKey: { name: "userId", allowNull: false },
     onDelete: "CASCADE",
@@ -53,6 +58,8 @@ const initializeAssociations = (sequelize) => {
     foreignKey: { name: "userId", allowNull: false },
     onDelete: "CASCADE",
   });
+  // OrderItem.belongsTo(Order, { foreignKey: "orderId" });
+  // OrderItem.belongsTo(Product, { foreignKey: "productId" });
 };
 
 module.exports = initializeAssociations;

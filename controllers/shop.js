@@ -324,19 +324,28 @@ exports.postOrder = (req, res, next) => {
           productId: item.Product.id,
           quantity: item.quantity,
           price: item.Product.price,
+          cartId: fetchedCart.id,
         });
       });
       return Promise.all(orderItemPromises);
     })
     .then(() => {
-      return fetchedCart.setCartItems(null); // Clear cart items
+      return CartItem.destroy({ where: { cartId: fetchedCart.id } }); // Delete all CartItems associated with this cart
+    })
+    .then(() => {
+      // Clear the association in the Cart model
+      return fetchedCart.setCartItems([]);
     })
     .then(() => {
       res.redirect("/orders");
     })
     .catch((err) => {
       console.error("Error in postOrder:", err);
-      const error = new Error("Failed to create order");
+      let errorMessage = "Failed to create order";
+      if (err.name === "SequelizeValidationError") {
+        errorMessage = "Error clearing cart items";
+      }
+      const error = new Error(errorMessage);
       error.statusCode = 500;
       next(error);
     });
@@ -345,10 +354,18 @@ exports.postOrder = (req, res, next) => {
 exports.getOrders = (req, res, next) => {
   Order.findAll({
     where: { userId: req.user.id },
-    include: [{ model: Product }], // Corrected to use an array of include objects
+    include: [
+      {
+        model: Product,
+        through: {
+          model: OrderItem,
+          attributes: ["quantity", "price"], // Include OrderItem attributes if needed
+        },
+      },
+    ], // Corrected to use an array of include objects
   }) // Used Sequelize's findAll with include
     .then((orders) => {
-      console.log("Orders retrieved:", orders);
+      //console.log("Orders retrieved:", orders); //working
       if (!orders) {
         orders = []; // Ensure orders is an empty array if no orders are found
       }
